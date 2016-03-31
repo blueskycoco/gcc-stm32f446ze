@@ -52,7 +52,7 @@ ${COMPILER}:
 # Rules for building the uart_echo example.
 #
 ${COMPILER}/nucleo-stm32f446ze.axf: ${COMPILER}/startup_stm32f446xx.o
-${COMPILER}/nucleo-stm32f446ze.axf: ${COMPILER}/main.o
+${COMPILER}/nucleo-stm32f446ze.axf: ${COMPILER}/system_stm32f4xx.o
 ${COMPILER}/nucleo-stm32f446ze.axf: ${COMPILER}/misc.o
 ${COMPILER}/nucleo-stm32f446ze.axf: ${COMPILER}/stm32f4xx_adc.o
 ${COMPILER}/nucleo-stm32f446ze.axf: ${COMPILER}/stm32f4xx_can.o
@@ -95,8 +95,8 @@ ${COMPILER}/nucleo-stm32f446ze.axf: ${COMPILER}/stm32f4xx_tim.o
 ${COMPILER}/nucleo-stm32f446ze.axf: ${COMPILER}/stm32f4xx_usart.o
 ${COMPILER}/nucleo-stm32f446ze.axf: ${COMPILER}/stm32f4xx_wwdg.o
 ${COMPILER}/nucleo-stm32f446ze.axf: ${COMPILER}/stm32f4xx_it.o
-${COMPILER}/nucleo-stm32f446ze.axf: ${COMPILER}/system_stm32f4xx.o
 ${COMPILER}/nucleo-stm32f446ze.axf: ${COMPILER}/syscalls.o
+${COMPILER}/nucleo-stm32f446ze.axf: ${COMPILER}/main.o
 ${COMPILER}/nucleo-stm32f446ze.axf: STM32F446ZETx_FLASH.ld
 SCATTERgcc_nucleo-stm32f446ze=./Libraries/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc_ride7/STM32F446ZETx_FLASH.ld
 ENTRY_nucleo-stm32f446ze=Reset_Handler
