@@ -69,6 +69,36 @@ static void USART_Config(void);
 #endif /* __GNUC__ */
 
 /* Private functions ---------------------------------------------------------*/
+static unsigned char  fac_us=0;//us延时倍乘数
+static unsigned short fac_ms=0;//ms延时倍乘数
+//初始化延迟函数
+void delay_init(unsigned char SYSCLK)//SYSCLK =48
+{
+ SysTick->CTRL&=0xfffffffb;//选择内部时钟 HCLK/8
+ fac_us=SYSCLK/4;      
+ fac_ms=(unsigned short)fac_us*1000;
+}            
+//延时Nms
+//注意Nms的范围
+//Nms<=0xffffff*8/SYSCLK
+//对72M条件下,Nms<=1864 
+void delay_ms(unsigned short nms)
+{    
+ SysTick->LOAD=(unsigned long)nms*fac_ms; //时间加载  
+ SysTick->CTRL|=0x01;               //开始倒数    
+ while(!(SysTick->CTRL&(1<<16)));   //等待时间到达 
+ SysTick->CTRL&=0XFFFFFFFE;         //关闭计数器
+ SysTick->VAL=0X00000000;           //清空计数器     
+}   
+//延时us           
+void delay_us(unsigned long Nus)
+{ 
+ SysTick->LOAD=Nus*fac_us;       //时间加载      
+ SysTick->CTRL|=0x01;            //开始倒数    
+ while(!(SysTick->CTRL&(1<<16)));//等待时间到达 
+ SysTick->CTRL=0X00000000;       //关闭计数器
+ SysTick->VAL=0X00000000;        //清空计数器     
+}  
 
 /**
   * @brief  Main program
@@ -85,7 +115,9 @@ int main(void)
           
   /* USART Configuration */     
   USART_Config();
-
+  STM_EVAL_LEDInit();
+  delay_init(180);
+#if 0
   /* Display Plain Data */
   Display_PlainData();
 
@@ -106,8 +138,16 @@ int main(void)
 
   /* Display decrypted data */
   Display_DecryptedData();
-
-  while(1);  
+#endif
+  while(1)
+  {
+  	led(1);
+  	printf("led on\n");
+	delay_ms(1000);
+	led(0);
+	printf("led off\n");
+	delay_ms(1000);
+  }
 }
 
 /**
@@ -488,7 +528,36 @@ void STM_EVAL_COMInit(COM_TypeDef COM, USART_InitTypeDef* USART_InitStruct)
   /* Enable USART */
   USART_Cmd(COM_USART[COM], ENABLE);
 }
+void STM_EVAL_LEDInit()
+{	
+	GPIO_InitTypeDef GPIO_InitStructure;
 
+	/* Enable GPIO clock */
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+	/* Configure USART Tx as alternate function  */
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0|GPIO_Pin_7|GPIO_Pin_14;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+}
+void led(int on)
+{
+	if(on)
+	{
+		GPIO_SetBits(GPIOB,GPIO_Pin_0);
+		GPIO_SetBits(GPIOB,GPIO_Pin_7);
+		GPIO_SetBits(GPIOB,GPIO_Pin_14);
+	}
+	else
+	{	
+		GPIO_ResetBits(GPIOB,GPIO_Pin_0);
+		GPIO_ResetBits(GPIOB,GPIO_Pin_7);
+		GPIO_ResetBits(GPIOB,GPIO_Pin_14);
+	}
+}
 /**
   * @brief  USART configuration 
   * @param  None
