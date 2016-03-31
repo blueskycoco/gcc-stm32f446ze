@@ -30,9 +30,9 @@ int _read(int file, char *ptr, int len) {
   if(len == 0)
     return 0;
  // uart_wait_rcv();
-  //*ptr++ = uart_read();
+  *ptr++ = uart_read();
   for(todo = 1; todo < len; todo++) {
-  	//ch=uart_read();
+  	ch=uart_read();
     if(ch==-1) { break; }
     *ptr++ = ch;
   }
