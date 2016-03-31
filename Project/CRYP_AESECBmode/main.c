@@ -102,7 +102,7 @@ int main(void)
     Decryption                                          
 ======================================================*/
   /* Decryption */
-  AES128_Decrypt_DMA();
+  //AES128_Decrypt_DMA();
 
   /* Display decrypted data */
   Display_DecryptedData();
@@ -538,6 +538,11 @@ int uart_read()
 	char data;
 	data = USART_ReceiveData(EVAL_COM1);
 	return data;
+}
+int uart_send(unsigned char byte)
+{
+	__io_putchar(byte);
+	return 0;
 }
 
 #ifdef  USE_FULL_ASSERT
